@@ -1,5 +1,5 @@
 const config = {
-  alpha: { fHora: 4, fKm: 50, vHora: 60, vKm: 1.5, acion: 380 },
+  alpha: { fHora: 4, fKm: 50, vHora: 80, vKm: 1.7, acion: 420 },
   ativa_armado: { fHora: 4, fKm: 100, vHora: 80, vKm: 1.6, acion: 500 },
   ativa_pr: { fHora: 4, fKm: 100, vHora: 70, vKm: 1.6, acion: 450 },
   lider: { fHora: 4, fKm: 50, vHora: 60, vKm: 1.6, acion: 380 },
