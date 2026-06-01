@@ -224,3 +224,51 @@ label.rendicao-label input {
   text-align: center;
   color: #111;
 }
+.fab-container {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 9999;
+}
+
+.fab-container button {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: none;
+  background: #1e90ff;
+  color: white;
+  font-size: 22px;
+}
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.4);
+  justify-content: center;
+  align-items: center;
+}
+
+.modal.show {
+  display: flex;
+}
+
+.modal-content {
+  background: white;
+  width: 90%;
+  max-width: 500px;
+  border-radius: 16px;
+  padding: 20px;
+}
+.card-empresa {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 12px;
+
+  border: 1px solid #eee;
+  border-radius: 12px;
+
+  margin-top: 10px;
+}
