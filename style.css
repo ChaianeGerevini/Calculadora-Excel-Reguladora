@@ -257,6 +257,8 @@ label.rendicao-label input {
   background: white;
   width: 90%;
   max-width: 500px;
+  max-height: 80vh;
+  overflow-y: auto;
   border-radius: 16px;
   padding: 20px;
 }
@@ -271,4 +273,21 @@ label.rendicao-label input {
   border-radius: 12px;
 
   margin-top: 10px;
+}
+#listaEmpresas::-webkit-scrollbar {
+  width: 8px;
+}
+
+#listaEmpresas::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+#listaEmpresas::-webkit-scrollbar-thumb {
+  background: #1e90ff;
+  border-radius: 10px;
+}
+
+#listaEmpresas::-webkit-scrollbar-thumb:hover {
+  background: #187bcd;
 }

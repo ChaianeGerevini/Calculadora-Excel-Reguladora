@@ -122,7 +122,12 @@ function renderizarEmpresas() {
 function atualizarSelectEmpresas() {
   const select = document.getElementById("empresa");
 
-  select.innerHTML = '<option value="">- Escolha -</option>';
+  select.innerHTML = `
+    <option value="">- Escolha -</option>
+    <option value="vigia_armado">
+      Vigia Armado (Prestador)
+    </option>
+  `;
 
   empresas.forEach(emp => {
     const option = document.createElement("option");
@@ -163,24 +168,37 @@ function formatMoney(valor) {
 // VARIÁVEIS
 // ============================
 const container = document.getElementById("agentes-container");
-let count = 0;
+
 
 // ============================
 // SELECT CHANGE
 // ============================
 document.getElementById("empresa").addEventListener("change", (e) => {
-  document.getElementById("vigilante-config").style.display =
-    e.target.value === "vigilante" ? "block" : "none";
+
+  document.getElementById("vigilante-config").style.display = "none";
+  document.getElementById("vigia-armado-config").style.display = "none";
+
+  if (e.target.value === "vigilante") {
+    document.getElementById("vigilante-config").style.display = "block";
+  }
+
+  if (e.target.value === "vigia_armado") {
+    document.getElementById("vigia-armado-config").style.display = "block";
+  }
+
 });
 
 // ============================
 // ADD AGENTE (SEM ALTERAR)
 // ============================
 document.getElementById("addAgente").addEventListener("click", () => {
-  count++;
+
+  const numeroAgente =
+    document.querySelectorAll(".agente").length + 1;
 
   let rendHTML = "";
-  if (count > 1) {
+
+  if (numeroAgente > 1) {
     rendHTML = `
       <label class="rendicao-label">
         <span><strong>Rendição</strong></span>
@@ -194,7 +212,7 @@ document.getElementById("addAgente").addEventListener("click", () => {
     `
     <div class="agente">
       <button class="botaoRemover">X</button>
-      <h3>Agente ${count}</h3>
+      <h3>Agente ${numeroAgente}</h3>
 
       <label>Hora Saída <input type="datetime-local" class="inicio"></label>
       <label>Hora Término <input type="datetime-local" class="fim"></label>
@@ -209,14 +227,23 @@ document.getElementById("addAgente").addEventListener("click", () => {
     </div>
   `
   );
+  renumerarAgentes();
 });
+
+function renumerarAgentes() {
+  document.querySelectorAll(".agente").forEach((agente, index) => {
+    agente.querySelector("h3").textContent =
+      `Agente ${index + 1}`;
+  });
+}
 
 container.addEventListener("click", (e) => {
   if (e.target.classList.contains("botaoRemover")) {
     e.target.closest(".agente").remove();
+
+    renumerarAgentes();
   }
 });
-
 // ============================
 // CALCULO (INTACTO - SEU ORIGINAL)
 // ============================
@@ -224,8 +251,27 @@ document.getElementById("calcular").addEventListener("click", () => {
   const emp = document.getElementById("empresa").value;
   if (!emp) return alert("Selecione a empresa");
 
-  const conf = empresas.find(e => String(e.id) === emp);
-  if (!conf) return alert("Empresa não encontrada");
+  let conf;
+
+if (emp === "vigia_armado") {
+
+  conf = {
+    fHora: Number(document.getElementById("va_fHora").value) || 0,
+    fKm: Number(document.getElementById("va_fKm").value) || 0,
+    vHora: Number(document.getElementById("va_vHora").value) || 0,
+    vKm: Number(document.getElementById("va_vKm").value) || 0,
+    acion: Number(document.getElementById("va_acion").value) || 0
+  };
+
+} else {
+
+  conf = empresas.find(e => String(e.id) === emp);
+
+  if (!conf) {
+    return alert("Empresa não encontrada");
+  }
+
+}
 
   const agentesDOM = [...document.querySelectorAll(".agente")];
   if (!agentesDOM.length) return alert("Adicione agentes");
@@ -285,18 +331,27 @@ document.getElementById("calcular").addEventListener("click", () => {
 
     out += `<div class="resumo-grupo-bloco"><h2>Grupo ${gi + 1}</h2>`;
 
-    grupo.forEach((ag, idxG) => {
-      minutosGrupo += ag.totalMinutos;
-      kmGrupo += ag.kmTotal;
-      pedGrupo += ag.valorPedagios;
+grupo.forEach((ag, idxG) => {
+  minutosGrupo += ag.totalMinutos;
+  kmGrupo += ag.kmTotal;
+  pedGrupo += ag.valorPedagios;
 
-      out += `
-        <div class="resumo-agente">
-          <h3>Agente ${ag.index}</h3>
-          <p>${formatDateTimeLocal(ag.inicio)}</p>
-        </div>
-      `;
-    });
+  out += `
+    <div class="resumo-agente">
+      <h3>Agente ${ag.index} ${
+        idxG === 0 ? "(Principal)" : "(Rendição)"
+      }</h3>
+
+      <p><strong>Hora inicial:</strong> ${formatDateTimeLocal(ag.inicio)}</p>
+      <p><strong>Hora final:</strong> ${formatDateTimeLocal(ag.fim)}</p>
+      <p><strong>Total horas:</strong> ${formatDuration(ag.totalMinutos)}</p>
+
+      <p><strong>KM inicial:</strong> ${ag.kmI}</p>
+      <p><strong>KM final:</strong> ${ag.kmF}</p>
+      <p><strong>Total KM:</strong> ${ag.kmTotal}</p>
+    </div>
+  `;
+});
 
     const franquiaMin = conf.fHora * 60;
     const minutosCobrados = Math.max(0, minutosGrupo - franquiaMin);
@@ -310,14 +365,51 @@ document.getElementById("calcular").addEventListener("click", () => {
 
     totalGeral += totalGrupo;
 
-    out += `
-      <div>
-        <h3>Total grupo: ${formatMoney(totalGrupo)}</h3>
-      </div>
-    `;
+  out += `
+  <div class="resumo-grupo-totais">
+
+    <h3>Resumo do Grupo ${gi + 1}</h3>
+
+    <p><strong>Horas grupo:</strong> ${formatDuration(minutosGrupo)}</p>
+
+    <p><strong>Cobrado:</strong>
+      ${formatDuration(minutosGrupo)}
+      -
+      ${formatDuration(franquiaMin)}
+      =
+      ${formatDuration(minutosCobrados)}
+    </p>
+
+    <p><strong>KM grupo:</strong> ${kmGrupo}</p>
+
+    <p><strong>KM cobrados:</strong>
+      ${kmGrupo}
+      -
+      ${franquiaKm}
+      =
+      ${kmCobrados}
+    </p>
+
+    <p><strong>Acionamento:</strong> ${formatMoney(conf.acion)}</p>
+    <p><strong>Hora:</strong> ${formatMoney(valorHora)}</p>
+    <p><strong>KM:</strong> ${formatMoney(valorKm)}</p>
+    <p><strong>Pedágios:</strong> ${formatMoney(pedGrupo)}</p>
+
+    <h4>Total grupo:</h4>
+    <p class="total-grupo-valor">
+      ${formatMoney(totalGrupo)}
+    </p>
+
+  </div>
+</div>
+`;
   });
 
-  out += `<h1>Total Geral: ${formatMoney(totalGeral)}</h1>`;
+  out += `
+  <h1 class="total-geral">
+    Total Geral: ${formatMoney(totalGeral)}
+  </h1>
+`;
 
   document.getElementById("resultado").innerHTML = out;
 });
@@ -372,3 +464,59 @@ document.getElementById("listaEmpresas").addEventListener("click", async (e) => 
 // INIT
 // ============================
 document.addEventListener("DOMContentLoaded", carregarEmpresas);
+
+// ============================
+// MODAIS
+// ============================
+console.log("CHEGUEI NOS MODAIS");
+
+const btnConfig = document.getElementById("btnConfig");
+const modalEmpresas = document.getElementById("modalEmpresas");
+const modalCadastroEmpresa = document.getElementById("modalCadastroEmpresa");
+
+const fecharEmpresas = document.getElementById("fecharEmpresas");
+const fecharCadastroEmpresa = document.getElementById("fecharCadastroEmpresa");
+
+const novaEmpresa = document.getElementById("novaEmpresa");
+
+// abrir lista de empresas
+btnConfig.addEventListener("click", () => {
+  console.log("CLICOU");
+  modalEmpresas.classList.add("show");
+
+});
+
+// fechar lista de empresas
+fecharEmpresas.addEventListener("click", () => {
+  modalEmpresas.classList.remove("show");
+});
+
+// abrir cadastro de empresa
+novaEmpresa.addEventListener("click", () => {
+  empresaEditando = null;
+
+  empNome.value = "";
+  empFrHora.value = 0;
+  empFrKm.value = 0;
+  empValorHora.value = 0;
+  empValorKm.value = 0;
+  empAcion.value = 0;
+
+  modalCadastroEmpresa.classList.add("show");
+});
+
+// fechar cadastro
+fecharCadastroEmpresa.addEventListener("click", () => {
+  modalCadastroEmpresa.classList.remove("show");
+});
+
+// fechar clicando fora
+window.addEventListener("click", (e) => {
+  if (e.target === modalEmpresas) {
+    modalEmpresas.classList.remove("show");
+  }
+
+  if (e.target === modalCadastroEmpresa) {
+    modalCadastroEmpresa.classList.remove("show");
+  }
+});
