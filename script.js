@@ -1,11 +1,8 @@
 const supabaseUrl = "https://lblnsalijvhzcrhmmmvt.supabase.co";
-const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxibG5zYWxpanZoemNyaG1tbXZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwODgxODEsImV4cCI6MjA5NTY2NDE4MX0.gWWWqm9ZAcndxhPMIy2Muf8WJLhxwRDFfoT9WJ7gmo8";
+const supabaseKey =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxibG5zYWxpanZoemNyaG1tbXZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwODgxODEsImV4cCI6MjA5NTY2NDE4MX0.gWWWqm9ZAcndxhPMIy2Muf8WJLhxwRDFfoT9WJ7gmo8";
 
-const supabaseClient = supabase.createClient(
-  supabaseUrl,
-  supabaseKey
-);
-
+const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
 
 // ============================
 // EMPRESAS (GLOBAL)
@@ -27,20 +24,31 @@ async function carregarEmpresas() {
     return;
   }
 
-  empresas = data.map(e => ({
+  empresas = data.map((e) => ({
     id: e.id,
     nome: e.nome,
     fHora: e.fhora,
     fKm: e.fkm,
     vHora: e.vhora,
     vKm: e.vkm,
-    acion: e.acion
+    acion: e.acion,
   }));
 
   atualizarSelectEmpresas();
   renderizarEmpresas();
 }
+async function registrarAcesso(pagina) {
+  const { error } = await supabaseClient.from("acessos").insert([
+    {
+      pagina,
+      navegador: navigator.userAgent,
+    },
+  ]);
 
+  if (error) {
+    console.error("Erro ao registrar acesso:", error);
+  }
+}
 // ============================
 // SALVAR (CREATE/UPDATE)
 // ============================
@@ -54,7 +62,7 @@ async function salvarEmpresaSupabase(dados) {
         fkm: dados.fKm,
         vhora: dados.vHora,
         vkm: dados.vKm,
-        acion: dados.acion
+        acion: dados.acion,
       })
       .eq("id", empresaEditando);
 
@@ -67,8 +75,8 @@ async function salvarEmpresaSupabase(dados) {
         fkm: dados.fKm,
         vhora: dados.vHora,
         vkm: dados.vKm,
-        acion: dados.acion
-      }
+        acion: dados.acion,
+      },
     ]);
 
     if (error) console.error(error);
@@ -82,10 +90,7 @@ async function salvarEmpresaSupabase(dados) {
 // EXCLUIR
 // ============================
 async function excluirEmpresaSupabase(id) {
-  const { error } = await supabaseClient
-    .from("empresas")
-    .delete()
-    .eq("id", id);
+  const { error } = await supabaseClient.from("empresas").delete().eq("id", id);
 
   if (error) console.error(error);
 
@@ -99,7 +104,7 @@ function renderizarEmpresas() {
   const lista = document.getElementById("listaEmpresas");
   lista.innerHTML = "";
 
-  empresas.forEach(emp => {
+  empresas.forEach((emp) => {
     lista.insertAdjacentHTML(
       "beforeend",
       `
@@ -111,7 +116,7 @@ function renderizarEmpresas() {
           <button class="btnExcluir" data-id="${emp.id}">🗑️</button>
         </div>
       </div>
-      `
+      `,
     );
   });
 }
@@ -124,12 +129,12 @@ function atualizarSelectEmpresas() {
 
   select.innerHTML = `
     <option value="">- Escolha -</option>
-    <option value="vigia_armado">
+    <option value="vigilante">
       Vigia Armado (Prestador)
     </option>
   `;
 
-  empresas.forEach(emp => {
+  empresas.forEach((emp) => {
     const option = document.createElement("option");
     option.value = emp.id;
     option.textContent = emp.nome;
@@ -140,14 +145,50 @@ function atualizarSelectEmpresas() {
 // ============================
 // FORMATADORES (NÃO MEXI)
 // ============================
+function parseDataFlexivel(texto) {
+  if (!texto) return "";
+
+  texto = texto.trim();
+
+  // formato BR: 25/06/2026 15:12
+  const br = texto.match(
+    /(\d{1,2})\/(\d{1,2})\/(\d{2,4})[^\d]*(\d{1,2}):(\d{2})/,
+  );
+
+  if (br) {
+    let [, dia, mes, ano, hora, min] = br;
+
+    if (ano.length === 2) ano = "20" + ano;
+
+    const d = new Date(
+      `${ano}-${mes.padStart(2, "0")}-${dia.padStart(2, "0")}T${hora.padStart(
+        2,
+        "0",
+      )}:${min}`,
+    );
+
+    if (!isNaN(d)) {
+      return d.toISOString().slice(0, 16);
+    }
+  }
+
+  // fallback
+  const d2 = new Date(texto);
+  if (!isNaN(d2)) {
+    return d2.toISOString().slice(0, 16);
+  }
+
+  return "";
+}
+
 function formatDateTimeLocal(value) {
   const d = new Date(value);
   if (isNaN(d)) return "-";
   return `${String(d.getDate()).padStart(2, "0")}/${String(
-    d.getMonth() + 1
+    d.getMonth() + 1,
   ).padStart(2, "0")}/${d.getFullYear()} - ${String(d.getHours()).padStart(
     2,
-    "0"
+    "0",
   )}:${String(d.getMinutes()).padStart(2, "0")}`;
 }
 
@@ -160,7 +201,7 @@ function formatDuration(mins) {
 function formatMoney(valor) {
   return valor.toLocaleString("pt-BR", {
     style: "currency",
-    currency: "BRL"
+    currency: "BRL",
   });
 }
 
@@ -169,12 +210,10 @@ function formatMoney(valor) {
 // ============================
 const container = document.getElementById("agentes-container");
 
-
 // ============================
 // SELECT CHANGE
 // ============================
 document.getElementById("empresa").addEventListener("change", (e) => {
-
   document.getElementById("vigilante-config").style.display = "none";
   document.getElementById("vigia-armado-config").style.display = "none";
 
@@ -185,16 +224,13 @@ document.getElementById("empresa").addEventListener("change", (e) => {
   if (e.target.value === "vigia_armado") {
     document.getElementById("vigia-armado-config").style.display = "block";
   }
-
 });
 
 // ============================
 // ADD AGENTE (SEM ALTERAR)
 // ============================
 document.getElementById("addAgente").addEventListener("click", () => {
-
-  const numeroAgente =
-    document.querySelectorAll(".agente").length + 1;
+  const numeroAgente = document.querySelectorAll(".agente").length + 1;
 
   let rendHTML = "";
 
@@ -225,15 +261,14 @@ document.getElementById("addAgente").addEventListener("click", () => {
 
       ${rendHTML}
     </div>
-  `
+  `,
   );
   renumerarAgentes();
 });
 
 function renumerarAgentes() {
   document.querySelectorAll(".agente").forEach((agente, index) => {
-    agente.querySelector("h3").textContent =
-      `Agente ${index + 1}`;
+    agente.querySelector("h3").textContent = `Agente ${index + 1}`;
   });
 }
 
@@ -251,167 +286,238 @@ document.getElementById("calcular").addEventListener("click", () => {
   const emp = document.getElementById("empresa").value;
   if (!emp) return alert("Selecione a empresa");
 
-  let conf;
-
-if (emp === "vigia_armado") {
-
-  conf = {
-    fHora: Number(document.getElementById("va_fHora").value) || 0,
-    fKm: Number(document.getElementById("va_fKm").value) || 0,
-    vHora: Number(document.getElementById("va_vHora").value) || 0,
-    vKm: Number(document.getElementById("va_vKm").value) || 0,
-    acion: Number(document.getElementById("va_acion").value) || 0
-  };
-
-} else {
-
-  conf = empresas.find(e => String(e.id) === emp);
-
-  if (!conf) {
-    return alert("Empresa não encontrada");
-  }
-
-}
+  const conf =
+    emp === "vigilante"
+      ? {
+          fHora: +vig_fHora.value || 0,
+          fKm: +vig_fKm.value || 0,
+          vHora: +vig_vHora.value || 0,
+          vKm: +vig_vKm.value || 0,
+          acion: +vig_acion.value || 0,
+        }
+      : empresas.find((e) => String(e.id) === emp);
 
   const agentesDOM = [...document.querySelectorAll(".agente")];
   if (!agentesDOM.length) return alert("Adicione agentes");
 
-  const agentes = agentesDOM.map((div, idx) => {
-    const inicio = new Date(div.querySelector(".inicio").value);
+  let grupos = [];
+  let grupoAtual = null;
+
+  agentesDOM.forEach((div, i) => {
+    const ini = new Date(div.querySelector(".inicio").value);
     const fim = new Date(div.querySelector(".fim").value);
 
-    const totalMinutos = Math.max(0, Math.round((fim - inicio) / 60000));
-
-    const kmI = +div.querySelector(".kmInicio").value || 0;
-    const kmF = +div.querySelector(".kmFim").value || 0;
-    const kmTotal = Math.max(0, kmF - kmI);
-
-    const qtdPed = +div.querySelector(".qtdPed").value || 0;
-    const valPed = +div.querySelector(".valorPed").value || 0;
-
-    const valorPedagios = qtdPed * valPed;
-
-    const rend =
-      idx > 0 ? !!div.querySelector(".rendicaoDoAnterior")?.checked : false;
-
-    return {
-      index: idx + 1,
-      inicio,
-      fim,
-      totalMinutos,
-      kmI,
-      kmF,
-      kmTotal,
-      qtdPed,
-      valPed,
-      valorPedagios,
-      rend
-    };
-  });
-
-  const grupos = [];
-  let atual = [agentes[0]];
-
-  for (let i = 1; i < agentes.length; i++) {
-    if (agentes[i].rend) atual.push(agentes[i]);
-    else {
-      grupos.push(atual);
-      atual = [agentes[i]];
+    if (isNaN(ini) || isNaN(fim)) {
+      alert(`Preencha data e hora do Agente ${i + 1}`);
+      throw new Error("Datas inválidas");
     }
-  }
-  grupos.push(atual);
+
+    const dados = {
+      id: i + 1,
+      ini,
+      fim,
+      kmI: +div.querySelector(".kmInicio").value || 0,
+      kmF: +div.querySelector(".kmFim").value || 0,
+      qtdPed: +div.querySelector(".qtdPed").value || 0,
+      vPed: +div.querySelector(".valorPed").value || 0,
+      isRendicao: div.querySelector(".rendicaoDoAnterior")?.checked || false,
+    };
+
+    if (!dados.isRendicao || !grupoAtual) {
+      grupoAtual = { pai: dados, rendicoes: [] };
+      grupos.push(grupoAtual);
+    } else {
+      grupoAtual.rendicoes.push(dados);
+    }
+  });
 
   let totalGeral = 0;
-  let out = "";
+  let resumoHTML = "";
 
-  grupos.forEach((grupo, gi) => {
-    let minutosGrupo = 0;
-    let kmGrupo = 0;
-    let pedGrupo = 0;
+  grupos.forEach((grupo, idxGrupo) => {
+    const agentes = [grupo.pai, ...grupo.rendicoes];
+    const temRendicao = grupo.rendicoes.length > 0;
+    const horaInicialGrupo = agentes[0].ini;
+    const horaFinalGrupo = agentes[agentes.length - 1].fim;
 
-    out += `<div class="resumo-grupo-bloco"><h2>Grupo ${gi + 1}</h2>`;
+    const kmInicialGrupo = agentes[0].kmI;
+    const kmFinalGrupo = agentes[agentes.length - 1].kmF;
 
-grupo.forEach((ag, idxG) => {
-  minutosGrupo += ag.totalMinutos;
-  kmGrupo += ag.kmTotal;
-  pedGrupo += ag.valorPedagios;
+    const minutosTotal = agentes.reduce((s, a) => {
+      return s + Math.round((a.fim - a.ini) / 60000);
+    }, 0);
 
-  out += `
-    <div class="resumo-agente">
-      <h3>Agente ${ag.index} ${
-        idxG === 0 ? "(Principal)" : "(Rendição)"
-      }</h3>
+    const horasTotal = minutosTotal / 60;
 
-      <p><strong>Hora inicial:</strong> ${formatDateTimeLocal(ag.inicio)}</p>
-      <p><strong>Hora final:</strong> ${formatDateTimeLocal(ag.fim)}</p>
-      <p><strong>Total horas:</strong> ${formatDuration(ag.totalMinutos)}</p>
+    const minutosFranquia = conf.fHora * 60;
+    const minutosAbatidos = Math.min(minutosTotal, minutosFranquia);
+    const minutosExtra = Math.max(0, minutosTotal - minutosFranquia);
 
-      <p><strong>KM inicial:</strong> ${ag.kmI}</p>
-      <p><strong>KM final:</strong> ${ag.kmF}</p>
-      <p><strong>Total KM:</strong> ${ag.kmTotal}</p>
-    </div>
-  `;
-});
+    const kmTotal = agentes.reduce((s, a) => s + (a.kmF - a.kmI), 0);
 
-    const franquiaMin = conf.fHora * 60;
-    const minutosCobrados = Math.max(0, minutosGrupo - franquiaMin);
+    const kmExtra = Math.max(0, kmTotal - conf.fKm);
 
-    const franquiaKm = conf.fKm;
-    const kmCobrados = Math.max(0, kmGrupo - franquiaKm);
+    const valorHoras = (minutosExtra / 60) * conf.vHora;
+    const valorKM = kmExtra * conf.vKm;
+    let totalPedagiosGrupo = 0;
+    let totalAcionamentosGrupo = 0;
 
-    const valorHora = (minutosCobrados / 60) * conf.vHora;
-    const valorKm = kmCobrados * conf.vKm;
-    const totalGrupo = conf.acion + valorHora + valorKm + pedGrupo;
+    agentes.forEach((ag, idx) => {
+      const minutosAg = Math.round((ag.fim - ag.ini) / 60000);
+      const horasAg = minutosAg / 60;
+      const kmAg = ag.kmF - ag.kmI;
+      const pedagio = ag.qtdPed * ag.vPed;
+      const acion = ag.isRendicao ? 0 : conf.acion;
 
-    totalGeral += totalGrupo;
+      const franquiaHoras = formatDuration(minutosFranquia);
+      const horasTotal = formatDuration(minutosAg);
+      const horasCobradas = formatDuration(minutosExtra);
 
-  out += `
-  <div class="resumo-grupo-totais">
+      const franquiaKm = conf.fKm.toFixed(2);
+      const kmTotalAg = kmAg.toFixed(2);
+      const kmCobrados = kmExtra.toFixed(2);
 
-    <h3>Resumo do Grupo ${gi + 1}</h3>
+      const custoHora = horasAg * conf.vHora;
+      const custoKM = kmAg * conf.vKm;
 
-    <p><strong>Horas grupo:</strong> ${formatDuration(minutosGrupo)}</p>
+      let totalAg;
 
-    <p><strong>Cobrado:</strong>
-      ${formatDuration(minutosGrupo)}
-      -
-      ${formatDuration(franquiaMin)}
-      =
-      ${formatDuration(minutosCobrados)}
-    </p>
+      if (temRendicao) {
+        totalAg = custoHora + custoKM + acion + pedagio;
+      } else {
+        totalAg = acion + pedagio + valorHoras + valorKM;
+      }
 
-    <p><strong>KM grupo:</strong> ${kmGrupo}</p>
+      totalPedagiosGrupo += pedagio;
+      totalAcionamentosGrupo += acion;
 
-    <p><strong>KM cobrados:</strong>
-      ${kmGrupo}
-      -
-      ${franquiaKm}
-      =
-      ${kmCobrados}
-    </p>
+      if (temRendicao) {
+        resumoHTML += `
+<strong>Agente ${ag.id}${ag.isRendicao ? " (RENDIÇÃO)" : ""}</strong><br><br>
 
-    <p><strong>Acionamento:</strong> ${formatMoney(conf.acion)}</p>
-    <p><strong>Hora:</strong> ${formatMoney(valorHora)}</p>
-    <p><strong>KM:</strong> ${formatMoney(valorKm)}</p>
-    <p><strong>Pedágios:</strong> ${formatMoney(pedGrupo)}</p>
+Hora Inicial: ${formatDateTimeLocal(ag.ini)}<br>
+Hora Final: ${formatDateTimeLocal(ag.fim)}<br>
+Total Horas: ${formatDuration(minutosAg)}<br><br>
 
-    <h4>Total grupo:</h4>
-    <p class="total-grupo-valor">
-      ${formatMoney(totalGrupo)}
-    </p>
+KM Inicial: ${ag.kmI.toFixed(2)}<br>
+KM Final: ${ag.kmF.toFixed(2)}<br>
+Total KM: ${kmAg.toFixed(2)} km<br><br>
 
-  </div>
-</div>
+Horas: ${formatMoney(custoHora)}<br>
+KM: ${formatMoney(custoKM)}<br>
+Acionamento: ${formatMoney(acion)}<br>
+Pedágios: ${formatMoney(pedagio)}<br><br>
+
+<strong>Subtotal Agente:</strong>
+${formatMoney(totalAg)}
+
+<hr>
 `;
+      } else {
+        resumoHTML += `
+    <strong>Agente ${ag.id}</strong><br><br>
+
+    <strong>HORAS</strong><br><br>
+
+    Hora Inicial: ${formatDateTimeLocal(ag.ini)}<br>
+    Hora Final: ${formatDateTimeLocal(ag.fim)}<br><br>
+
+    Total Horas: ${formatDuration(minutosAg)}<br>
+    (-) Franquia: ${formatDuration(minutosFranquia)}<br>
+    Horas Cobradas: ${formatDuration(minutosExtra)}<br><br>
+
+    ${formatDuration(minutosExtra)} × ${formatMoney(conf.vHora)} =
+    <strong>${formatMoney(valorHoras)}</strong>
+
+    <hr>
+
+    <strong>KM</strong><br><br>
+
+    KM Inicial: ${ag.kmI.toFixed(2)}<br>
+    KM Final: ${ag.kmF.toFixed(2)}<br><br>
+
+    Total KM: ${kmAg.toFixed(2)} km<br>
+    (-) Franquia: ${conf.fKm.toFixed(2)} km<br>
+    KM Cobrados: ${kmExtra.toFixed(2)} km<br><br>
+
+    ${kmExtra.toFixed(2)} × ${formatMoney(conf.vKm)} =
+    <strong>${formatMoney(valorKM)}</strong>
+
+    <hr>
+
+    Acionamento: ${formatMoney(acion)}<br>
+    Pedágios: ${formatMoney(pedagio)}<br><br>
+
+    <strong>Subtotal Agente:</strong> ${formatMoney(totalAg)}
+
+    <hr>
+    `;
+      }
+    });
+    if (temRendicao) {
+      resumoHTML += `
+<h3>Grupo ${idxGrupo + 1}</h3>
+
+<strong>HORAS</strong><br><br>
+
+${agentes
+  .map(
+    (ag) =>
+      `Agente ${ag.id}: ${formatDuration(
+        Math.round((ag.fim - ag.ini) / 60000),
+      )}`,
+  )
+  .join("<br>")}
+
+<br><br>
+
+Total Horas: ${formatDuration(minutosTotal)}<br>
+(-) Franquia: ${formatDuration(minutosFranquia)}<br>
+Horas Cobradas: ${formatDuration(minutosExtra)}<br><br>
+
+${formatDuration(minutosExtra)} × ${formatMoney(conf.vHora)}
+=
+<strong>${formatMoney(valorHoras)}</strong>
+
+<hr>
+
+<strong>KM</strong><br><br>
+
+${agentes
+  .map((ag) => `Agente ${ag.id}: ${(ag.kmF - ag.kmI).toFixed(2)} km`)
+  .join("<br>")}
+
+<br><br>
+
+Total KM: ${kmTotal.toFixed(2)} km<br>
+(-) Franquia: ${conf.fKm.toFixed(2)} km<br>
+KM Cobrados: ${kmExtra.toFixed(2)} km<br><br>
+
+${kmExtra.toFixed(2)} × ${formatMoney(conf.vKm)}
+=
+<strong>${formatMoney(valorKM)}</strong>
+
+<hr>
+
+<strong>Pedágios:</strong> ${formatMoney(totalPedagiosGrupo)}<br>
+
+<strong>Acionamentos:</strong> ${formatMoney(totalAcionamentosGrupo)}<br><br>
+
+<strong>Total Grupo:</strong>
+${formatMoney(
+  valorHoras + valorKM + totalPedagiosGrupo + totalAcionamentosGrupo,
+)}
+
+<hr><hr>
+`;
+    }
+
+    totalGeral +=
+      valorHoras + valorKM + totalPedagiosGrupo + totalAcionamentosGrupo;
   });
 
-  out += `
-  <h1 class="total-geral">
-    Total Geral: ${formatMoney(totalGeral)}
-  </h1>
-`;
-
-  document.getElementById("resultado").innerHTML = out;
+  resumoHTML += `<h2>Total Geral da Operação: R$ ${totalGeral.toFixed(2)}</h2>`;
+  document.getElementById("resumoTotal").innerHTML = resumoHTML;
 });
 
 // ============================
@@ -427,7 +533,7 @@ document.getElementById("salvarEmpresa").addEventListener("click", async () => {
     fKm: Number(empFrKm.value),
     vHora: Number(empValorHora.value),
     vKm: Number(empValorKm.value),
-    acion: Number(empAcion.value)
+    acion: Number(empAcion.value),
   };
 
   await salvarEmpresaSupabase(dados);
@@ -436,43 +542,71 @@ document.getElementById("salvarEmpresa").addEventListener("click", async () => {
 });
 
 // editar/excluir
-document.getElementById("listaEmpresas").addEventListener("click", async (e) => {
-  const id = Number(e.target.dataset.id);
+document
+  .getElementById("listaEmpresas")
+  .addEventListener("click", async (e) => {
+    const id = Number(e.target.dataset.id);
 
-  if (e.target.classList.contains("btnEditar")) {
-    const emp = empresas.find(e => e.id === id);
-    empresaEditando = id;
+    if (e.target.classList.contains("btnEditar")) {
+      const emp = empresas.find((e) => e.id === id);
+      empresaEditando = id;
 
-    empNome.value = emp.nome;
-    empFrHora.value = emp.fHora;
-    empFrKm.value = emp.fKm;
-    empValorHora.value = emp.vHora;
-    empValorKm.value = emp.vKm;
-    empAcion.value = emp.acion;
+      empNome.value = emp.nome;
+      empFrHora.value = emp.fHora;
+      empFrKm.value = emp.fKm;
+      empValorHora.value = emp.vHora;
+      empValorKm.value = emp.vKm;
+      empAcion.value = emp.acion;
 
-    document.getElementById("modalCadastroEmpresa").classList.add("show");
-  }
-
-  if (e.target.classList.contains("btnExcluir")) {
-    if (confirm("Excluir empresa?")) {
-      await excluirEmpresaSupabase(id);
+      document.getElementById("modalCadastroEmpresa").classList.add("show");
     }
-  }
-});
+
+    if (e.target.classList.contains("btnExcluir")) {
+      if (confirm("Excluir empresa?")) {
+        await excluirEmpresaSupabase(id);
+      }
+    }
+  });
 
 // ============================
 // INIT
 // ============================
-document.addEventListener("DOMContentLoaded", carregarEmpresas);
+document.addEventListener("DOMContentLoaded", async () => {
+  await carregarEmpresas();
 
+  if (!sessionStorage.getItem("calculadoraVisitada")) {
+    await registrarAcesso("calculadora");
+    sessionStorage.setItem("calculadoraVisitada", "true");
+  }
+});
+container.addEventListener("paste", (e) => {
+  const el = e.target;
+
+  if (
+    !el ||
+    (!el.classList.contains("inicio") && !el.classList.contains("fim"))
+  )
+    return;
+
+  const texto = (e.clipboardData || window.clipboardData).getData("text");
+
+  const convertido = parseDataFlexivel(texto);
+
+  if (!convertido) return;
+
+  e.preventDefault();
+  el.value = convertido;
+});
 // ============================
 // MODAIS
 // ============================
-console.log("CHEGUEI NOS MODAIS");
 
 const btnConfig = document.getElementById("btnConfig");
 const modalEmpresas = document.getElementById("modalEmpresas");
 const modalCadastroEmpresa = document.getElementById("modalCadastroEmpresa");
+const btnSuporte = document.getElementById("btnSuporte");
+const modalSuporte = document.getElementById("modalSuporte");
+const fecharSuporte = document.getElementById("fecharSuporte");
 
 const fecharEmpresas = document.getElementById("fecharEmpresas");
 const fecharCadastroEmpresa = document.getElementById("fecharCadastroEmpresa");
@@ -481,9 +615,10 @@ const novaEmpresa = document.getElementById("novaEmpresa");
 
 // abrir lista de empresas
 btnConfig.addEventListener("click", () => {
-  console.log("CLICOU");
   modalEmpresas.classList.add("show");
-
+});
+btnSuporte.addEventListener("click", () => {
+  modalSuporte.classList.add("show");
 });
 
 // fechar lista de empresas
@@ -509,7 +644,9 @@ novaEmpresa.addEventListener("click", () => {
 fecharCadastroEmpresa.addEventListener("click", () => {
   modalCadastroEmpresa.classList.remove("show");
 });
-
+fecharSuporte.addEventListener("click", () => {
+  modalSuporte.classList.remove("show");
+});
 // fechar clicando fora
 window.addEventListener("click", (e) => {
   if (e.target === modalEmpresas) {
@@ -519,4 +656,56 @@ window.addEventListener("click", (e) => {
   if (e.target === modalCadastroEmpresa) {
     modalCadastroEmpresa.classList.remove("show");
   }
+
+  if (e.target === modalSuporte) {
+    modalSuporte.classList.remove("show");
+  }
+});
+container.addEventListener("paste", (e) => {
+  const el = e.target;
+
+  if (!el.classList.contains("inicio") && !el.classList.contains("fim")) return;
+
+  const texto = (e.clipboardData || window.clipboardData).getData("text");
+
+  const convertido = parseDataFlexivel(texto);
+
+  if (!convertido) return;
+
+  e.preventDefault();
+  el.value = convertido;
+});
+
+document.getElementById("enviarSuporte").addEventListener("click", async () => {
+  const tipo = document.getElementById("tipoSuporte").value;
+  const nome = document.getElementById("inputSup").value.trim();
+  const descricao = document.getElementById("descricaoSuporte").value.trim();
+
+  if (!descricao) {
+    alert("Descreva o problema ou a melhoria.");
+    return;
+  }
+
+  const { error } = await supabaseClient.from("chamados").insert([
+    {
+      tipo,
+      nome,
+      descricao,
+      status: "Aberto",
+    },
+  ]);
+
+  if (error) {
+    console.error(error);
+    alert("Erro ao enviar o chamado.");
+    return;
+  }
+
+  alert("Chamado enviado com sucesso!");
+
+  document.getElementById("tipoSuporte").value = "Bug";
+  document.getElementById("inputSup").value = "";
+  document.getElementById("descricaoSuporte").value = "";
+
+  modalSuporte.classList.remove("show");
 });

@@ -1,147 +1,178 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
-<head>
-<meta charset="UTF-8">
-<title>Calculadora de acionamentos</title>
-<link rel="stylesheet" href="style.css">
-</head>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="site html" />
+    <meta name="keywords" content="calculadora, acionamentos" />
+    <meta name="author" content="Chaiane Oliveeira Gerevini" />
+    <title>Calculadora de acionamentos</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
 
-<body>
+  <!---->
+  <body>
+    <div class="container">
+      <!--abertura container-->
+      <div class="topo">
+        <img
+          src="https://i.postimg.cc/MZ1hgCcJ/Image.jpg"
+          width="150"
+          alt="Logo CENOP"
+          class="logo"
+        />
+        <h1>Calculadora de acionamentos Excel Reguladora</h1>
+      </div>
 
-<div class="container">
-  <div class="topo">
-    <img src="https://i.postimg.cc/MZ1hgCcJ/Image.jpg" width="150" alt="Logo CENOP" class="logo">
-    <h1>Calculadora de acionamentos Excel Reguladora</h1>
+      <div class="Conteudo">
+        <select id="empresa">
+          <option value="">- Escolha -</option>
+        </select>
+
+        <div id="agentes-container"></div>
+
+        <button id="addAgente">Adicionar Agente</button>
+        <button id="calcular">Calcular Total</button>
+
+        <!-- ANÚNCIO -->
+<div class="ad-container">
+  <span>Publicidade</span>
+
+  <div class="ad-slot">
+    <!-- Código do Google AdSense será colocado aqui -->
   </div>
+</div>
 
-  <div class="Conteudo">
+        <div id="vigilante-config" style="display: none; margin-top: 10px">
+          <h4>Configuração para Vigilante</h4>
+          <label
+            >Franquia de Horas:
+            <input type="number" step="0.1" id="vig_fHora" value="4"
+          /></label>
+          <label
+            >Franquia de KM: <input type="number" id="vig_fKm" value="50"
+          /></label>
+          <label
+            >Valor Hora (R$):
+            <input type="number" step="0.01" id="vig_vHora" value="60"
+          /></label>
+          <label
+            >Valor KM (R$):
+            <input type="number" step="0.01" id="vig_vKm" value="1.5"
+          /></label>
+          <label
+            >Valor Acionamento (R$):
+            <input type="number" step="0.01" id="vig_acion" value="380"
+          /></label>
+        </div>
 
-  
- <select id="empresa">
-  <option value="">- Escolha -</option>
-</select>
+        <div id="vigia-armado-config" style="display: none; margin-top: 10px">
+          <h4>Vigia Armado - Prestador</h4>
 
-    <div id="agentes-container"></div>
+          <label>Franquia Horas</label>
+          <input type="number" id="va_fHora" value="4" />
 
-    <button id="addAgente">Adicionar Agente</button>
-    <button id="calcular">Calcular Total</button>
+          <label>Franquia KM</label>
+          <input type="number" id="va_fKm" value="100" />
 
-    <div id="vigilante-config" style="display:none; margin-top: 10px;">
-      <h4>Configuração para Vigilante</h4>
-      <label>Franquia de Horas: <input type="number" step="0.1" id="vig_fHora" value="4"></label>
-      <label>Franquia de KM: <input type="number" id="vig_fKm" value="50"></label>
-      <label>Valor Hora (R$): <input type="number" step="0.01" id="vig_vHora" value="60"></label>
-      <label>Valor KM (R$): <input type="number" step="0.01" id="vig_vKm" value="1.5"></label>
-      <label>Valor Acionamento (R$): <input type="number" step="0.01" id="vig_acion" value="380"></label>
+          <label>Valor Hora</label>
+          <input type="number" id="va_vHora" step="0.01" />
+
+          <label>Valor KM</label>
+          <input type="number" id="va_vKm" step="0.01" />
+
+          <label>Valor Acionamento</label>
+          <input type="number" id="va_acion" step="0.01" />
+        </div>
+        <div id="resultado">
+          <h2>Resultado</h2>
+          <div id="resumoTotal"></div>
+        </div>
+      </div>
+      <!-- Conteudo -->
+
+      <div class="fab-container">
+        <button id="btnConfig">⚙️</button>
+        <button id="btnSuporte">💬</button>
+      </div>
+
+      <div id="modalEmpresas" class="modal">
+        <div class="modal-content">
+          <button class="btn-fechar-modal" id="fecharEmpresas">✕</button>
+
+          <h2>Empresas</h2>
+
+          <button id="novaEmpresa">+ Nova Empresa</button>
+
+          <div id="listaEmpresas"></div>
+        </div>
+      </div>
+
+      <div id="modalCadastroEmpresa" class="modal">
+        <div class="modal-content">
+          <button class="btn-fechar-modal" id="fecharCadastroEmpresa">✕</button>
+
+          <h2>Empresa</h2>
+          <label>Nome da empresa</label>
+          <input id="empNome" type="text" />
+
+          <label>Franquia Hora</label>
+          <input id="empFrHora" type="number" />
+
+          <label>Franquia KM</label>
+          <input id="empFrKm" type="number" />
+
+          <label>Valor Hora</label>
+          <input id="empValorHora" type="number" step="0.01" />
+
+          <label>Valor KM</label>
+          <input id="empValorKm" type="number" step="0.01" />
+
+          <label>Valor Acionamento</label>
+          <input id="empAcion" type="number" step="0.01" />
+
+          <button id="salvarEmpresa">Salvar</button>
+        </div>
+      </div>
+      <div id="modalSuporte" class="modal">
+        <div class="modal-content">
+          <button class="btn-fechar-modal" id="fecharSuporte">✕</button>
+
+          <h2>Suporte</h2>
+
+          <label>Tipo</label>
+
+          <select id="tipoSuporte">
+            <option value="Bug">🐞 Bug</option>
+            <option value="Melhoria">💡 Melhoria</option>
+          </select>
+
+          <input id="inputSup" placeholder="Nome" value="" />
+
+          <br />
+
+          <label>Descrição</label>
+
+          <textarea
+            id="descricaoSuporte"
+            rows="6"
+            placeholder="Descreva o problema ou a melhoria..."
+          ></textarea>
+
+          <button id="enviarSuporte">Enviar</button>
+        </div>
+      </div>
+
+      <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+      <script src="script.js"></script>
+      <footer class="footer-update">
+        <div class="footer-update-title">✨ Últimas Atualizações</div>
+
+        <div class="footer-update-items">
+          <span>24/07/2026 <br /></span>
+        </div>
+      </footer>
     </div>
-
-</select>
-
-<div id="vigilante-config" style="display:none; margin-top:10px;">
-  ...
-</div>
-
-<div id="vigia-armado-config" style="display:none; margin-top:10px;">
-
-  <h4>Vigia Armado - Prestador</h4>
-
-  <label>Franquia Horas</label>
-  <input type="number" id="va_fHora" value="4">
-
-  <label>Franquia KM</label>
-  <input type="number" id="va_fKm" value="100">
-
-  <label>Valor Hora</label>
-  <input type="number" id="va_vHora" step="0.01">
-
-  <label>Valor KM</label>
-  <input type="number" id="va_vKm" step="0.01">
-
-  <label>Valor Acionamento</label>
-  <input type="number" id="va_acion" step="0.01">
-
-</div>
-
-<div id="agentes-container"></div>
-    <div id="resultado">
-      <h2></h2>
-      <p id="resumoTotal"></p>
-    </div>
-
-  </div>
-</div>
-<div class="fab-container">
-
-  <button id="btnConfig">
-    ⚙️
-  </button>
-
-</div>
-
-<div id="modalEmpresas" class="modal">
-
-  <div class="modal-content">
-
-    <button
-      class="btn-fechar-modal"
-      id="fecharEmpresas">
-      ✕
-    </button>
-
-    <h2>
-      Empresas
-    </h2>
-
-    <button id="novaEmpresa">
-      + Nova Empresa
-    </button>
-
-    <div id="listaEmpresas"></div>
-
-  </div>
-
-</div>
-
-<div id="modalCadastroEmpresa" class="modal">
-
-<div class="modal-content">
-
-  <button
-    class="btn-fechar-modal"
-    id="fecharCadastroEmpresa">
-    ✕
-  </button>
-
-  <h2>
-    Empresa
-  </h2>
-<label>Nome da empresa</label>
-<input id="empNome" type="text" />
-
-<label>Franquia Hora</label>
-<input id="empFrHora" type="number" />
-
-<label>Franquia KM</label>
-<input id="empFrKm" type="number" />
-
-<label>Valor Hora</label>
-<input id="empValorHora" type="number" step="0.01" />
-
-<label>Valor KM</label>
-<input id="empValorKm" type="number" step="0.01" />
-
-<label>Valor Acionamento</label>
-<input id="empAcion" type="number" step="0.01" />
-
-    <button id="salvarEmpresa">
-      Salvar
-    </button>
-
-  </div>
-
-</div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="script.js"></script>
-</body>
+    <!-- fechamento Container -->
+  </body>
 </html>
-

@@ -11,12 +11,12 @@ body {
 .container {
   display: flex;
   flex-direction: column;
-  background: #ffffff;
+  background: #FFFFFF;
   padding: 24px 24px 28px;
   border-radius: 16px;
   max-width: 780px;
   width: 100%;
-  box-shadow: 0 12px 25px rgba(0,0,0,0.18);
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.18);
 }
 
 /* Topo com logo e título */
@@ -29,20 +29,21 @@ body {
   margin-left: 5px;
 }
 
-.topo h1, .topo h2 {
+.topo h1,
+.topo h2 {
   margin: 0;
 }
 
 /* Bloco de conteúdo interno */
 .Conteudo {
-  background: #fafafa;
+  background: #FAFAFA;
   font-style: italic;
   padding: 20px;
   border-radius: 12px;
   max-width: 100%;
   box-sizing: border-box;
   width: 100%;
-  box-shadow: 0 0 8px rgba(0,0,0,0.08);
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.08);
 }
 
 img {
@@ -64,16 +65,19 @@ input {
   padding: 7px 9px;
   font-size: 14px;
   border-radius: 6px;
-  border: 1px solid #ccc;
+  border: 1px solid #CCC;
   box-sizing: border-box;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s;
 }
 
 input:focus {
   outline: none;
-  border-color: #1e90ff;
-  box-shadow: 0 0 0 2px rgba(30,144,255,0.25);
-  background: #fdfefe;
+  border-color: #1E90FF;
+  box-shadow: 0 0 0 2px rgba(30, 144, 255, 0.25);
+  background: #FDFEFE;
 }
 
 /* Botões */
@@ -85,12 +89,25 @@ button {
   cursor: pointer;
   border: 1px solid #111;
   font-weight: 600;
-  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s;
+
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    background 0.15s;
+}
+
+.btn-fechar-modal {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #FDFEFE;
+  font-size: 22px;
+  cursor: pointer;
 }
 
 /* Botão remover agente */
 .botaoRemover {
-  background: #e74c3c;
+  background: #E74C3C;
   color: white;
   border-radius: 999px;
   border: none;
@@ -100,49 +117,49 @@ button {
 }
 
 .botaoRemover:hover {
-  background: #e76758;
+  background: #E76758;
   transform: translateY(-1px);
-  box-shadow: 0 3px 6px rgba(0,0,0,0.25);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.25);
 }
 
 /* Botões principais (usar os IDs que você tiver no HTML) */
 #adicionar,
 #addAgente {
-  background: #f3f3f3;
+  background: #F3F3F3;
   color: #111;
   border-radius: 999px;
   border: 1px solid #111;
 }
 
 #calcular {
-  background: #1e90ff;
+  background: #1E90FF;
   color: white;
   border-radius: 999px;
-  border: 1px solid #004c9e;
+  border: 1px solid #004C9E;
 }
 
 #adicionar:hover,
 #addAgente:hover {
-  background: #e9e9e9;
+  background: #E9E9E9;
   transform: translateY(-1px);
-  box-shadow: 0 3px 6px rgba(0,0,0,0.18);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.18);
 }
 
 #calcular:hover {
-  background: #1c86ee;
+  background: #1C86EE;
   transform: translateY(-1px);
-  box-shadow: 0 3px 8px rgba(0,0,0,0.25);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
 }
 
 /* Card de agente */
 .agente {
-  border: 2px solid #aa7474;
+  border: 2px solid #AA7474;
   border-radius: 12px;
   padding: 14px 14px 10px;
   margin-top: 12px;
   position: relative;
-  background: #fffdfd;
-  box-shadow: 0 3px 6px rgba(0,0,0,0.06);
+  background: #FFFDFD;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.06);
 }
 
 .agente h3 {
@@ -173,16 +190,16 @@ label.rendicao-label input {
 #resultado {
   margin-top: 20px;
   padding-top: 10px;
-  border-top: 1px solid #ddd;
+  border-top: 1px solid #DDD;
   font-size: 14px;
 }
 
 .resumo-agente {
-  background: #fdfdfd;
+  background: #FDFDFD;
   border-radius: 10px;
   padding: 10px 12px;
   margin-bottom: 8px;
-  border: 1px solid #eee;
+  border: 1px solid #EEE;
 }
 
 .resumo-agente h3 {
@@ -193,11 +210,11 @@ label.rendicao-label input {
 }
 
 .resumo-grupo-bloco {
-  background: #f8f8f8;
+  background: #F8F8F8;
   border-radius: 12px;
   padding: 12px 14px 10px;
   margin: 14px 0;
-  border: 1px solid #e0e0e0;
+  border: 1px solid #E0E0E0;
 }
 
 .resumo-grupo-bloco h2 {
@@ -209,13 +226,13 @@ label.rendicao-label input {
 .resumo-grupo-totais {
   margin-top: 10px;
   padding-top: 6px;
-  border-top: 1px dashed #ccc;
+  border-top: 1px dashed #CCC;
 }
 
 .total-grupo-valor {
   font-size: 16px;
   font-weight: 700;
-  color: #1e90ff;
+  color: #1E90FF;
 }
 
 .total-geral {
@@ -226,25 +243,41 @@ label.rendicao-label input {
 }
 .fab-container {
   position: fixed;
+  top: 20px;
   right: 20px;
-  bottom: 20px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
   z-index: 9999;
 }
 
 .fab-container button {
   width: 60px;
   height: 60px;
-  border-radius: 50%;
   border: none;
-  background: #1e90ff;
+  border-radius: 50%;
+
+  background: #1E90FF;
   color: white;
-  font-size: 22px;
+
+  font-size: 24px;
+  cursor: pointer;
+
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+
+  transition: 0.2s;
+}
+
+.fab-container button:hover {
+  transform: scale(1.08);
 }
 .modal {
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,.4);
+  background: rgba(0, 0, 0, 0.4);
   justify-content: center;
   align-items: center;
 }
@@ -254,6 +287,7 @@ label.rendicao-label input {
 }
 
 .modal-content {
+  position: relative;
   background: white;
   width: 90%;
   max-width: 500px;
@@ -269,7 +303,7 @@ label.rendicao-label input {
 
   padding: 12px;
 
-  border: 1px solid #eee;
+  border: 1px solid #EEE;
   border-radius: 12px;
 
   margin-top: 10px;
@@ -279,15 +313,113 @@ label.rendicao-label input {
 }
 
 #listaEmpresas::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: #F1F1F1;
   border-radius: 10px;
 }
 
 #listaEmpresas::-webkit-scrollbar-thumb {
-  background: #1e90ff;
+  background: #1E90FF;
   border-radius: 10px;
 }
 
 #listaEmpresas::-webkit-scrollbar-thumb:hover {
-  background: #187bcd;
+  background: #187BCD;
+}
+.footer-update {
+  max-width: 1400px;
+  margin: 20px auto;
+
+  padding: 15px;
+
+  text-align: center;
+
+  border-top: 1px solid #DDD;
+}
+
+.footer-update-title {
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.footer-update-items {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+#descricaoSuporte {
+  width: 100%;
+  min-height: 180px;
+
+  resize: vertical;
+
+  padding: 12px;
+  margin-top: 8px;
+  margin-bottom: 20px;
+
+  border: 1px solid #CCC;
+  border-radius: 8px;
+
+  font-size: 15px;
+
+  box-sizing: border-box;
+}
+
+#tipoSuporte {
+  width: 100%;
+
+  padding: 20px;
+
+  margin-top: 8px;
+  margin-bottom: 20px;
+
+  border-radius: 8px;
+}
+
+#enviarSuporte {
+  width: 100%;
+
+  padding: 14px;
+
+  border: none;
+  border-radius: 8px;
+
+  background: #1E90FF;
+  color: white;
+
+  font-size: 16px;
+  cursor: pointer;
+}
+
+#enviarSuporte:hover {
+  background: #1877D3;
+}
+#novaEmpresa,
+#salvarEmpresa {
+  background: #F1F1F1;
+}
+.btnEditar {
+  background: #F1F1F1;
+}
+.btnExcluir {
+  background: #F1F1F1;
+}
+.ad-container {
+  width: 100%;
+  max-width: 728px;
+  margin: 25px auto;
+  text-align: center;
+}
+
+.ad-container > span {
+  display: block;
+  font-size: 11px;
+  color: #888;
+  margin-bottom: 5px;
+}
+
+.ad-slot {
+  width: 100%;
+  min-height: 90px;
 }
